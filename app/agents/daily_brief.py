@@ -9,7 +9,7 @@ from sqlalchemy import select
 
 from app.db.session import SessionLocal
 from app.db import models as m
-from app.services.llm import generate_daily_brief_text
+from app.llm import generate_daily_brief_text
 from app.services.tts import synthesize_speech
 
 
@@ -311,9 +311,7 @@ def run_daily_brief(user_id: int, target_date: date | None = None) -> m.Brief:
         # --- TTS (optional) ---
         audio_path = None
         if user.tts_enabled:
-            # e.g. store under ./data/audio/brief_USERID_DATE.mp3
-            audio_path = f"data/audio/brief_{user.id}_{target_date.isoformat()}.mp3"
-            audio_path = synthesize_speech(brief_text, audio_path)
+            audio_path = synthesize_speech(brief_text)
 
         # Upsert Brief row for this user/date
         existing_brief: m.Brief | None = (
